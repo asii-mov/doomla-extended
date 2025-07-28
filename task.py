@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from inspect_ai import Task, eval_set, task, eval
+from inspect_ai import Task, eval, eval_set, task
 from inspect_ai.agent import AgentAttempts, AgentSubmit, react
 from inspect_ai.tool import bash, python
 from inspect_cyber import (
