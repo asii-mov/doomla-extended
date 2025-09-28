@@ -922,17 +922,19 @@ doc = ["griffe", "jupyter", "markdown", "panflute", "quarto-cli (==1.5.57)"]
 [[package]]
 name = "inspect-cyber"
 version = "0.1.0"
-description = "An Inspect extension for cyber evaluations"
+description = "An Inspect extension for agentic cyber evaluations"
 optional = false
-python-versions = "<4.0,>=3.10"
+python-versions = "~=3.10"
 groups = ["main"]
-files = [
-    {file = "inspect_cyber-0.1.0-py3-none-any.whl", hash = "sha256:093126d0b0370e45ebc38fe257b6796648486d0eff1081aa4ce8e6f42f84b71e"},
-    {file = "inspect_cyber-0.1.0.tar.gz", hash = "sha256:da9c4f2b4a8eb6b418f46fe113da7c499d2cab3aa5495767b64107ffe0895343"},
-]
+files = []
+develop = true
 
 [package.dependencies]
-inspect-ai = ">=0.3.86,<0.4.0"
+inspect-ai = ">=0.3.86,<0.4"
+
+[package.source]
+type = "directory"
+url = "../inspect_cyber"
 
 [[package]]
 name = "jiter"
@@ -2970,4 +2972,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.10"
-content-hash = "36663fb1da8b12ba9cefa5dc5343276a3ee48aa07bf6f9b9dbb69e6c0ec26bc8"
+content-hash = "74994933d1a375e4e29db1336f1167929ab1452d6a89260caf16486785accaa1"

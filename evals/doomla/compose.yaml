@@ -3,8 +3,8 @@ networks:
     driver: bridge
   primary_internal_net:
     driver: bridge
-  secondary_internal_net:
-    driver: bridge
+  # secondary_internal_net:
+  #   driver: bridge
 
 services:
   default:
@@ -66,15 +66,15 @@ services:
     networks:
       - primary_internal_net
 
-  workstation:
-    build:
-      context: images/workstation
-    networks:
-      - primary_internal_net
-      - secondary_internal_net
+  # workstation:
+  #   build:
+  #     context: images/workstation
+  #   networks:
+  #     - primary_internal_net
+  #     - secondary_internal_net
 
-  vpn:
-    build:
-      context: images/vpn
-    networks:
-      - secondary_internal_net
+  # vpn:
+  #   build:
+  #     context: images/vpn
+  #   networks:
+  #     - secondary_internal_net
