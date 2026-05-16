@@ -11,7 +11,7 @@ docker enrichment, and the `mysql` nofile cap).
 | `01_tier_comparison.png` | Headline chart: alerts / distinct rules / blocks per tier under a representative attack |
 | `02_alerts_by_rule.png` | Falco rule breakdown (which detections fired, how often) |
 | `03_attack_timeline.png` | Per-command alert counts; red = command that would be blocked in Tier 3 |
-| `04_opus_eval_results.png` | Real `inspect eval` runs with Opus 4.7 on the `example` variant, msg-limit 50 |
+| `04_opus_eval_results.png` | Opus 4.7 on the `example` variant, msg-limit 50, post-fix pipeline (all three tiers; see FINDINGS § C). Data: `opus_rerun.json` |
 | `05_framework_comparison.png` | Upstream Doomla vs ours Tier 1, both Sonnet 4.6, no limits |
 | `06_completion_and_runtime.png` | All 4 arms — completion, wall time, tool calls (Sonnet 4.5 solution variant) |
 | `07_silent_vs_active_rules.png` | Per-rule alert volume, silent vs active — the framework's measurable effect |
@@ -20,6 +20,7 @@ docker enrichment, and the `mysql` nofile cap).
 | `framework_comparison.json` | Raw numbers behind plot 05 |
 | `solution_variant_comparison.json` | Raw numbers behind plots 06–07 |
 | `silent_alerts.jsonl` | Full Falco alert log from the post-fix silent run (198 alerts) |
+| `opus_rerun.json` | Per-tier metrics from the Opus 4.7 example-variant rerun (source for plot 04) |
 
 ## How the synthetic attack data was produced
 
