@@ -1,5 +1,22 @@
 # Doomla!
 
+> [!NOTE]
+> **`doomla-extended` — fork of [UKGovernmentBEIS/doomla](https://github.com/UKGovernmentBEIS/doomla).**
+> Adds a three-tier defensive evaluation framework on top of Inspect Cyber so
+> the same Doomla scenario can be run against a defended target. Tier 2 puts
+> a [**Falco**](https://falco.org/) runtime-security sidecar alongside the
+> target containers to record what the agent trips; Tier 3 wraps the agent's
+> bash tool so warning-level Falco alerts return a synthetic EDR block. Tier 1
+> (the default) is upstream Doomla, unchanged. Jump to
+> [Defensive Tiers](#defensive-tiers) for the design and
+> [`FINDINGS.md`](./FINDINGS.md) for the writeup.
+>
+> Falco is the demonstrator backend, not a commercial EDR — see
+> [the Falco caveat in Limitations](#limitations--read-before-interpreting-results)
+> and [`FINDINGS.md` § E](./FINDINGS.md#e-realistic-edr-backends) for what
+> swapping in a real EDR (CrowdStrike Falcon Sensor, SentinelOne, Wazuh,
+> Sysdig Secure, …) would buy.
+
 Doomla! is a basic cyber range evaluation created to [serve as an example](https://inspect.cyber.aisi.org.uk/doomla.html) for using [Inspect Cyber](https://inspect.cyber.aisi.org.uk/).
 
 It involves assessing an agent’s ability to exploit a known CVE, find sensitive information in a database, crack encrypted passwords, spray credentials to gain access to a host, escalate privileges within that host, and move laterally across subnetworks.
@@ -95,13 +112,27 @@ default (`baseline`) is upstream Doomla.
 | 2 — `silent` | Silent monitoring | Falco sidecar logs all alerts | none | no |
 | 3 — `active` | Active EDR | Falco sidecar logs all alerts | wrapped bash returns a synthetic block | yes (existence only) |
 
-Architecture: a privileged **Falco sidecar** watches syscalls on the *target*
-containers via modern eBPF and writes JSON alerts to a shared volume. The
-`defended_bash` tool wraps Inspect's `bash()`; in Tier 3 it polls new alerts
-after each command and returns a generic synthetic EDR block message if a
-blocking-threshold alert fired. All scoring metrics (`alert_count`,
-`distinct_rules_triggered`, `resilience`) are computed post-run from the
-complete alert log at `/var/log/falco/alerts.jsonl`, not from in-loop polling.
+Architecture: a privileged **[Falco](https://falco.org/) sidecar** watches
+syscalls on the *target* containers via modern eBPF and writes JSON alerts to a
+shared volume. The `defended_bash` tool wraps Inspect's `bash()`; in Tier 3 it
+polls new alerts after each command and returns a generic synthetic EDR block
+message if a blocking-threshold alert fired. All scoring metrics
+(`alert_count`, `distinct_rules_triggered`, `resilience`) are computed post-run
+from the complete alert log at `/var/log/falco/alerts.jsonl`, not from in-loop
+polling.
+
+**Falco is the demonstrator backend, not a commercial EDR.** Falco is a CNCF
+runtime-security tool that does syscall-based detection via eBPF with a YAML
+rule engine; it does *not* have the kernel-mode driver, behavioural ML, threat
+intelligence feeds, memory scanning, or anti-tamper protections of products
+like CrowdStrike Falcon Sensor, SentinelOne, or Microsoft Defender for
+Endpoint. It's used here because it's open-source, container-native, and easy
+to drop into a compose file. The wrapper, scorer, and tier prompts treat the
+backend as a generic alert source (see
+[`inspect_cyber_defended/alert_reader.py`](./inspect_cyber_defended/alert_reader.py)),
+so swapping Falco for a more representative detector — Wazuh, Sysdig Secure,
+or a logged feed from a real EDR — is a future-work item rather than a
+redesign; see [`FINDINGS.md` § E](./FINDINGS.md#e-realistic-edr-backends).
 
 The Kali agent container is **excluded** from monitoring: its offensive tooling
 trips many stock rules by design and would inflate detection counts with
@@ -207,6 +238,15 @@ metrics mean.
    pinning makes scores non-reproducible. The choice depends on whether the
    research goal is longitudinal capability tracking (pin) or
    current-defence-realism (track upstream).
+8. **Falco is not a commercial EDR.** It's a runtime-security syscall monitor
+   with a YAML rule engine — closer in spirit to an enriched host IDS than to
+   a commercial EDR. Numbers in `FINDINGS.md` characterise how the model
+   behaves against a *Falco-shaped* detector with the stock community ruleset;
+   that's a defensible proxy for entry-level runtime monitoring but it isn't
+   equivalent to a tier-1 commercial EDR. To get there, repoint
+   `alert_reader.py` at a more capable backend (Wazuh, Sysdig Secure, a
+   logged CrowdStrike Falcon feed, etc.) and rerun — see
+   [`FINDINGS.md` § E](./FINDINGS.md#e-realistic-edr-backends).
 
 ## Understand
 
