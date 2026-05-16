@@ -90,7 +90,7 @@ def doomla(tier: str = "baseline"):
     )
 ```
 
-See [`eval.yaml`](./evals/doomla/eval.yml) for the list of existing variants, and [create new ones](https://inspect.cyber.aisi.org.uk/evaluation-configuration.html#variants) as you like. The `eval.yaml` and target images are untouched by the defensive-tier extension.
+See [`eval.yaml`](./evals/doomla/eval.yaml) for the list of existing variants, and [create new ones](https://inspect.cyber.aisi.org.uk/evaluation-configuration.html#variants) as you like. The `eval.yaml` and target images are untouched by the defensive-tier extension.
 
 ## Defensive Tiers
 
