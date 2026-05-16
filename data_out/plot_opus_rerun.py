@@ -27,8 +27,13 @@ LOG_DIRS = {
 }
 ALERT_LOGS = {
     "silent": REPO / "logs_opus_rerun" / "silent" / "silent_alerts.jsonl",
-    "active": REPO / "logs_opus_rerun" / "active" / "active_alerts.jsonl",
+    "active": REPO / "logs_opus_rerun" / "active" / "active_alerts_uncapped.jsonl",
 }
+# Baseline + silent are msg-cap 50 (per the first rerun, kept). Active was
+# re-run again with no message limit so the chain could actually complete; the
+# `.eval` for that run is the newest in logs_opus_rerun/active/ and the alert
+# log is preserved under active_alerts_uncapped.jsonl.
+CAP_LABEL = {"baseline": "50-msg cap", "silent": "50-msg cap", "active": "uncapped"}
 
 
 def newest_eval(d: Path) -> Path:
@@ -135,29 +140,37 @@ def summarise(tier: str) -> dict:
 
 
 def plot_opus(rows: list[dict], out_png: Path) -> None:
-    labels = [r["tier"].capitalize() for r in rows]
+    labels = [f"{r['tier'].capitalize()}\n({CAP_LABEL[r['tier']]})" for r in rows]
     colors = ["#4c72b0", "#dd8452", "#c44e52"]
-    fig, axes = plt.subplots(1, 4, figsize=(15, 4.2))
+    fig, axes = plt.subplots(1, 4, figsize=(15, 4.6))
 
     panels = [
-        ("Completion (score)", [r["score"] for r in rows], (0, 1.15), "{:.2f}"),
-        ("Wall time (min)", [r["wall_seconds"] / 60 for r in rows], None, "{:.1f}m"),
-        ("Falco alerts (all sev.)", [r["alert_count_all"] for r in rows], None, "{:d}"),
-        ("Tier-3 blocks", [r["blocks"] for r in rows], None, "{:d}"),
+        ("Completion (score)", [r["score"] for r in rows], (0, 1.15), "{:.2f}", False),
+        ("Wall time (min)", [r["wall_seconds"] / 60 for r in rows], None, "{:.1f}m", False),
+        # Alerts span 0 → 809; use a log scale so the silent column doesn't vanish.
+        ("Falco alerts (all sev., log)", [r["alert_count_all"] for r in rows], None, "{:d}", True),
+        ("Tier-3 blocks", [r["blocks"] for r in rows], None, "{:d}", False),
     ]
-    for ax, (title, values, ylim, fmt) in zip(axes, panels):
+    for ax, (title, values, ylim, fmt, log_y) in zip(axes, panels):
         ax.bar(labels, values, color=colors)
         ax.set_title(title)
         if ylim:
             ax.set_ylim(*ylim)
+        if log_y:
+            # Place 0-valued bars just below the lower limit so the text still
+            # sits above zero in the visual.
+            ax.set_yscale("symlog", linthresh=1)
+            ax.set_ylim(0, max(values) * 3 if max(values) else 1)
         for i, v in enumerate(values):
             label = fmt.format(v) if isinstance(v, (int, float)) and v == v else "—"
-            ax.text(i, v if v else 0.02, label, ha="center", va="bottom", fontsize=10)
-        ax.tick_params(axis="x", labelsize=10)
+            offset = (max(values) or 1) * 0.02 if not log_y else 0.5
+            ax.text(i, v + offset, label, ha="center", va="bottom", fontsize=10)
+        ax.tick_params(axis="x", labelsize=9)
 
     fig.suptitle(
-        "Doomla example-variant — Opus 4.7, 50-message cap, post-fix pipeline",
-        fontsize=12,
+        "Doomla example-variant — Opus 4.7, post-fix pipeline\n"
+        "(baseline + silent: 50-msg cap; active: uncapped, completed the chain)",
+        fontsize=11,
     )
     fig.tight_layout()
     fig.savefig(out_png, dpi=120, bbox_inches="tight")
