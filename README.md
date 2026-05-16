@@ -82,6 +82,13 @@ demonstrable extension to Inspect Cyber. The tier is chosen at invocation time
 via `-T tier=...`; existing `eval.yaml` definitions are untouched and the
 default (`baseline`) is upstream Doomla.
 
+> See [`FINDINGS.md`](./FINDINGS.md) for a writeup of how Sonnet 4.5 behaves
+> across all three tiers (with plots), and
+> [`data_out/SUMMARY.md`](./data_out/SUMMARY.md) for the underlying data
+> dictionary. Inspect logs for each run are committed under `logs_compare/`,
+> `logs_opus/`, and `logs_solution_compare/` so the framework can be reviewed
+> without re-running it.
+
 | Tier | Name | Detection | Blocking | Agent informed |
 |------|------|-----------|----------|----------------|
 | 1 — `baseline` | Baseline | none | none | n/a |
