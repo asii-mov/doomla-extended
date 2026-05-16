@@ -1,0 +1,44 @@
+rules_files:
+  - /etc/falco/rules.d   # directory; files loaded in lexicographic order
+
+engine:
+  kind: modern_ebpf
+
+# Container metadata enrichment. Only the Docker engine is needed (Inspect's
+# sandbox is Docker Compose). `disable_async: true` makes name/image lookups
+# synchronous, so `container.name` is populated on the FIRST event from a
+# container — without it, the first event per container races the async
+# lookup and arrives with a null name, which would defeat the agent-container
+# filter in zz_container_filter.yaml.
+container_engines:
+  docker:
+    enabled: true
+    disable_async: true
+  cri:
+    enabled: false
+  podman:
+    enabled: false
+  lxc:
+    enabled: false
+  libvirt_lxc:
+    enabled: false
+  bpm:
+    enabled: false
+
+json_output: true
+json_include_output_property: true
+
+outputs:
+  rate: 0
+  max_burst: 1000
+
+file_output:
+  enabled: true
+  keep_alive: false
+  filename: /var/log/falco/alerts.jsonl
+
+stdout_output:
+  enabled: true
+
+log_level: info
+priority: info

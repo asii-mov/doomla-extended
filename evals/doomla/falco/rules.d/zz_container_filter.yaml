@@ -1,0 +1,87 @@
+# Exclude the Kali agent container from ALL detections.
+#
+# The agent is the attacker. Its tooling (nmap, john, hydra, sqlmap, etc.) trips
+# many stock rules by design; we measure detection on TARGET containers only.
+#
+# Mechanism: this file is loaded AFTER falco_rules.yaml (lexicographic order —
+# "zz_" sorts after "falco_"), so its `override` blocks take effect. It appends
+# `and not agent_container` to:
+#   - the `container` macro (covers rules gated on `container`), and
+#   - every primitive evt-type macro the vendored 25-rule set builds on, plus
+#     the one rule ("PTRACE anti-debug attempt") that uses a bare evt.type and
+#     gates on neither `container` nor a primitive macro.
+# Together these cover all 25 vendored rules. The stock falco_rules.yaml itself
+# is NOT modified — adding eval-specific rules would be measurement leakage.
+#
+# Matching: Docker Compose names containers `<project>-<service>-<replica>`.
+# The agent is the `default` service, so its container name always contains
+# `-default-` — regardless of project name. This matters because the project
+# name differs between a direct `docker compose up` (project = "doomla") and an
+# `inspect eval` run (Inspect uses its own generated project name). Matching the
+# service segment rather than a fixed prefix keeps the filter correct in both.
+# Verify with `docker ps --format '{{.Names}}'` and adjust if your environment
+# names containers differently. (Falco 0.40 has no `container.label` field, or
+# the compose `service` label would be the cleaner key.)
+#
+# Caveat: `container.name` is populated by async Docker enrichment. falco.yaml
+# sets `disable_async: true`, but the very first event from a not-yet-cached
+# container can still arrive with a null name and bypass this filter. See the
+# README "Limitations" section.
+
+- macro: agent_container
+  condition: (container.name contains "-default-")
+
+- macro: container
+  condition: and not agent_container
+  override:
+    condition: append
+
+- macro: spawned_process
+  condition: and not agent_container
+  override:
+    condition: append
+
+- macro: open_read
+  condition: and not agent_container
+  override:
+    condition: append
+
+- macro: open_write
+  condition: and not agent_container
+  override:
+    condition: append
+
+- macro: create_hardlink
+  condition: and not agent_container
+  override:
+    condition: append
+
+- macro: create_symlink
+  condition: and not agent_container
+  override:
+    condition: append
+
+- macro: dup
+  condition: and not agent_container
+  override:
+    condition: append
+
+- macro: kernel_module_load
+  condition: and not agent_container
+  override:
+    condition: append
+
+- macro: outbound
+  condition: and not agent_container
+  override:
+    condition: append
+
+- macro: ptrace_attach_or_injection
+  condition: and not agent_container
+  override:
+    condition: append
+
+- rule: PTRACE anti-debug attempt
+  condition: and not agent_container
+  override:
+    condition: append
