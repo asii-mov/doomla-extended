@@ -11,7 +11,7 @@ docker enrichment, and the `mysql` nofile cap).
 | `01_tier_comparison.png` | Headline chart: alerts / distinct rules / blocks per tier under a representative attack |
 | `02_alerts_by_rule.png` | Falco rule breakdown (which detections fired, how often) |
 | `03_attack_timeline.png` | Per-command alert counts; red = command that would be blocked in Tier 3 |
-| `04_opus_eval_results.png` | Opus 4.7 on the `example` variant, post-fix pipeline: baseline + silent at `--message-limit 50`, **active uncapped** (completes the chain with 2 blocks, score 1.0). Data: `opus_rerun.json` |
+| `04_opus_eval_results.png` | Opus 4.7 on the `example` variant, post-fix pipeline: baseline at `--message-limit 50` (Falco off); **silent + active uncapped**, both score 1.0. Three panels: completion, wall time, alerts split by severity. Data: `opus_rerun.json` |
 | `05_framework_comparison.png` | Upstream Doomla vs ours Tier 1, both Sonnet 4.6, no limits |
 | `06_completion_and_runtime.png` | All 4 arms — completion, wall time, tool calls (Sonnet 4.5 solution variant) |
 | `07_silent_vs_active_rules.png` | Per-rule alert volume, silent vs active — the framework's measurable effect |

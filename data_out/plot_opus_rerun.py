@@ -26,14 +26,15 @@ LOG_DIRS = {
     "active": REPO / "logs_opus_rerun" / "active",
 }
 ALERT_LOGS = {
-    "silent": REPO / "logs_opus_rerun" / "silent" / "silent_alerts.jsonl",
+    "silent": REPO / "logs_opus_rerun" / "silent" / "silent_alerts_uncapped.jsonl",
     "active": REPO / "logs_opus_rerun" / "active" / "active_alerts_uncapped.jsonl",
 }
-# Baseline + silent are msg-cap 50 (per the first rerun, kept). Active was
-# re-run again with no message limit so the chain could actually complete; the
-# `.eval` for that run is the newest in logs_opus_rerun/active/ and the alert
-# log is preserved under active_alerts_uncapped.jsonl.
-CAP_LABEL = {"baseline": "50-msg cap", "silent": "50-msg cap", "active": "uncapped"}
+# Baseline is msg-cap 50 from the first rerun (Falco off — no alerts to
+# capture either way; the cap just keeps cost down). Silent and active are
+# both uncapped so the chain can complete and we get a real silent-vs-active
+# alert-volume comparison for Opus. The newest .eval in each subdir is the
+# uncapped run; the older capped run is preserved alongside for traceability.
+CAP_LABEL = {"baseline": "50-msg cap", "silent": "uncapped", "active": "uncapped"}
 
 
 def newest_eval(d: Path) -> Path:
@@ -140,36 +141,65 @@ def summarise(tier: str) -> dict:
 
 
 def plot_opus(rows: list[dict], out_png: Path) -> None:
+    """Three-panel: completion, wall time, alert volume by severity.
+
+    Dropped the Tier-3 blocks panel — only Tier 3 can ever produce a non-zero
+    value there, so the panel was structurally a single useful bar surrounded
+    by zeros (the block-pivot table in FINDINGS § C carries that information).
+    """
     labels = [f"{r['tier'].capitalize()}\n({CAP_LABEL[r['tier']]})" for r in rows]
     colors = ["#4c72b0", "#dd8452", "#c44e52"]
-    fig, axes = plt.subplots(1, 4, figsize=(15, 4.6))
+    fig, axes = plt.subplots(1, 3, figsize=(13, 4.6))
 
-    panels = [
-        ("Completion (score)", [r["score"] for r in rows], (0, 1.15), "{:.2f}", False),
-        ("Wall time (min)", [r["wall_seconds"] / 60 for r in rows], None, "{:.1f}m", False),
-        # Alerts span 0 → 809; use a log scale so the silent column doesn't vanish.
-        ("Falco alerts (all sev., log)", [r["alert_count_all"] for r in rows], None, "{:d}", True),
-        ("Tier-3 blocks", [r["blocks"] for r in rows], None, "{:d}", False),
+    # Score panel
+    score_vals = [r["score"] for r in rows]
+    axes[0].bar(labels, score_vals, color=colors)
+    axes[0].set_title("Completion (score)")
+    axes[0].set_ylim(0, 1.15)
+    for i, v in enumerate(score_vals):
+        axes[0].text(i, v + 0.02, f"{v:.2f}", ha="center", va="bottom", fontsize=10)
+    axes[0].tick_params(axis="x", labelsize=9)
+
+    # Wall time panel
+    wall_vals = [r["wall_seconds"] / 60 for r in rows]
+    axes[1].bar(labels, wall_vals, color=colors)
+    axes[1].set_title("Wall time (min)")
+    for i, v in enumerate(wall_vals):
+        axes[1].text(
+            i, v + max(wall_vals) * 0.02, f"{v:.1f}m",
+            ha="center", va="bottom", fontsize=10,
+        )
+    axes[1].tick_params(axis="x", labelsize=9)
+
+    # Stacked alerts panel — split by Notice vs Warning+ so the framework's
+    # block-relevant signal isn't hidden inside the much-larger Notice count.
+    notice_vals = [
+        sum(n for sev, n in r["by_priority"].items() if sev == "Notice")
+        for r in rows
     ]
-    for ax, (title, values, ylim, fmt, log_y) in zip(axes, panels):
-        ax.bar(labels, values, color=colors)
-        ax.set_title(title)
-        if ylim:
-            ax.set_ylim(*ylim)
-        if log_y:
-            # Place 0-valued bars just below the lower limit so the text still
-            # sits above zero in the visual.
-            ax.set_yscale("symlog", linthresh=1)
-            ax.set_ylim(0, max(values) * 3 if max(values) else 1)
-        for i, v in enumerate(values):
-            label = fmt.format(v) if isinstance(v, (int, float)) and v == v else "—"
-            offset = (max(values) or 1) * 0.02 if not log_y else 0.5
-            ax.text(i, v + offset, label, ha="center", va="bottom", fontsize=10)
-        ax.tick_params(axis="x", labelsize=9)
+    warning_vals = [r["alert_count_warning_plus"] for r in rows]
+    axes[2].bar(labels, notice_vals, color="#a3b8d4", label="Notice")
+    axes[2].bar(labels, warning_vals, bottom=notice_vals, color="#dd8452",
+                label="Warning+")
+    axes[2].set_title("Falco alerts by severity (log scale)")
+    axes[2].set_yscale("symlog", linthresh=1)
+    totals = [n + w for n, w in zip(notice_vals, warning_vals)]
+    axes[2].set_ylim(0, max(totals) * 3 if max(totals) else 1)
+    for i, (w, t) in enumerate(zip(warning_vals, totals)):
+        if t > 0:
+            axes[2].text(
+                i, t + 0.5, f"{t} ({w} W+)",
+                ha="center", va="bottom", fontsize=9,
+            )
+        else:
+            axes[2].text(i, 0.5, "0", ha="center", va="bottom", fontsize=9)
+    axes[2].tick_params(axis="x", labelsize=9)
+    axes[2].legend(loc="upper left", fontsize=8)
+    axes[2].set_ylabel("alerts")
 
     fig.suptitle(
         "Doomla example-variant — Opus 4.7, post-fix pipeline\n"
-        "(baseline + silent: 50-msg cap; active: uncapped, completed the chain)",
+        "(baseline: 50-msg cap, Falco off; silent + active: uncapped, both complete the chain)",
         fontsize=11,
     )
     fig.tight_layout()
