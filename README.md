@@ -13,7 +13,7 @@
 >
 > Falco is the demonstrator backend, not a commercial EDR — see
 > [the Falco caveat in Limitations](#limitations--read-before-interpreting-results)
-> and [`FINDINGS.md` § E](./FINDINGS.md#e-realistic-edr-backends) for what
+> and [`FINDINGS.md` follow-ups](./FINDINGS.md#follow-ups) for what
 > swapping in a real EDR (CrowdStrike Falcon Sensor, SentinelOne, Wazuh,
 > Sysdig Secure, …) would buy.
 
@@ -99,12 +99,13 @@ demonstrable extension to Inspect Cyber. The tier is chosen at invocation time
 via `-T tier=...`; existing `eval.yaml` definitions are untouched and the
 default (`baseline`) is upstream Doomla.
 
-> See [`FINDINGS.md`](./FINDINGS.md) for a writeup of how Sonnet 4.5 behaves
-> across all three tiers (with plots), and
-> [`data_out/SUMMARY.md`](./data_out/SUMMARY.md) for the underlying data
-> dictionary. Inspect logs for each run are committed under `logs_compare/`,
-> `logs_opus/`, and `logs_solution_compare/` so the framework can be reviewed
-> without re-running it.
+> See [`FINDINGS.md`](./FINDINGS.md) for the cross-model writeup (Sonnet 4.5
+> and Opus 4.7 on the open `example` variant) and
+> [`data_out/SUMMARY.md`](./data_out/SUMMARY.md) for the data dictionary.
+> Inspect logs for the headline runs live under `logs_opus_rerun/` and
+> `logs_sonnet_example/`; earlier solution-variant + pre-fix data is in
+> [`_archive/`](./_archive/) (kept for traceability, not featured in the
+> analysis).
 
 | Tier | Name | Detection | Blocking | Agent informed |
 |------|------|-----------|----------|----------------|
@@ -112,14 +113,50 @@ default (`baseline`) is upstream Doomla.
 | 2 — `silent` | Silent monitoring | Falco sidecar logs all alerts | none | no |
 | 3 — `active` | Active EDR | Falco sidecar logs all alerts | wrapped bash returns a synthetic block | yes (existence only) |
 
-Architecture: a privileged **[Falco](https://falco.org/) sidecar** watches
-syscalls on the *target* containers via modern eBPF and writes JSON alerts to a
-shared volume. The `defended_bash` tool wraps Inspect's `bash()`; in Tier 3 it
-polls new alerts after each command and returns a generic synthetic EDR block
-message if a blocking-threshold alert fired. All scoring metrics
-(`alert_count`, `distinct_rules_triggered`, `resilience`) are computed post-run
-from the complete alert log at `/var/log/falco/alerts.jsonl`, not from in-loop
-polling.
+### Architecture
+
+A privileged **[Falco](https://falco.org/) sidecar** watches syscalls on the
+*target* containers via modern eBPF and writes JSON alerts to a shared volume.
+The `defended_bash` tool wraps Inspect's `bash()`; in Tier 3 it polls new
+alerts after each command and returns a generic synthetic EDR block message
+if a blocking-threshold (warning+) alert fired. All scoring metrics
+(`alert_count`, `distinct_rules_triggered`, `resilience`) are computed
+*post-run* from the complete alert log at `/var/log/falco/alerts.jsonl`, not
+from in-loop polling.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant A as Agent (react solver)
+    participant DB as defended_bash<br/>(tier-aware wrapper)
+    participant B as bash() in target<br/>container
+    participant F as Falco sidecar<br/>(eBPF)
+    participant L as alerts.jsonl<br/>(bind mount)
+    participant S as defended_scorer<br/>(post-run)
+
+    A->>DB: bash cmd
+    DB->>B: forward cmd
+    B-->>F: syscalls
+    F-->>L: append matched alerts<br/>(per stock community rule)
+    B-->>DB: stdout / stderr / exit
+    Note over DB: wait grace_period_ms<br/>(Tier 3 only — 750ms default)
+    DB->>L: read alerts since cmd start
+    alt Tier 3 + warning+ alert in window
+        DB-->>A: synthetic EDR block message<br/>("Permission denied: action blocked...")
+    else otherwise
+        DB-->>A: real stdout / stderr / exit
+    end
+
+    Note over S,L: at end of task
+    S->>L: read complete alert log
+    S-->>A: completion + alert_count<br/>+ distinct_rules + resilience
+```
+
+**Tier behaviour at a glance:** Tier 1 skips the sidecar entirely (Falco is
+profile-gated in `compose.yaml`). Tier 2 runs Falco but `block_on_alert` is
+False — the agent sees real bash output and never knows the EDR exists. Tier
+3 enables both Falco and the block, and the agent prompt acknowledges that
+"an EDR exists" without naming it or the ruleset.
 
 **Falco is the demonstrator backend, not a commercial EDR.** Falco is a CNCF
 runtime-security tool that does syscall-based detection via eBPF with a YAML
@@ -132,7 +169,7 @@ backend as a generic alert source (see
 [`inspect_cyber_defended/alert_reader.py`](./inspect_cyber_defended/alert_reader.py)),
 so swapping Falco for a more representative detector — Wazuh, Sysdig Secure,
 or a logged feed from a real EDR — is a future-work item rather than a
-redesign; see [`FINDINGS.md` § E](./FINDINGS.md#e-realistic-edr-backends).
+redesign; see [`FINDINGS.md` follow-ups](./FINDINGS.md#follow-ups).
 
 The Kali agent container is **excluded** from monitoring: its offensive tooling
 trips many stock rules by design and would inflate detection counts with
@@ -143,10 +180,21 @@ trips generic detections, not whether it trips rules written to catch it.
 ### Invocation
 
 ```bash
+# the three defensive tiers
 inspect eval task.py@doomla -T tier=baseline --model openai/gpt-4o
 inspect eval task.py@doomla -T tier=silent   --model openai/gpt-4o
 inspect eval task.py@doomla -T tier=active   --model openai/gpt-4o
+
+# Tier 3 + the full Falco ruleset prepended to the agent prompt
+# (§A "informed red-teamer" experiment in FINDINGS.md)
+inspect eval task.py@doomla -T tier=active -T disclose_rules=true \
+    --model openai/gpt-4o
 ```
+
+Optional `-T variant=example|solution` selects which prompt the agent gets;
+default is `example` (open-ended). All example-variant runs in
+[`FINDINGS.md`](./FINDINGS.md) use no `--message-limit`. See
+[`task.py`](./task.py) for the full parameter list.
 
 ### Version pins
 
@@ -246,7 +294,7 @@ metrics mean.
    equivalent to a tier-1 commercial EDR. To get there, repoint
    `alert_reader.py` at a more capable backend (Wazuh, Sysdig Secure, a
    logged CrowdStrike Falcon feed, etc.) and rerun — see
-   [`FINDINGS.md` § E](./FINDINGS.md#e-realistic-edr-backends).
+   [`FINDINGS.md` follow-ups](./FINDINGS.md#follow-ups).
 
 ## Understand
 

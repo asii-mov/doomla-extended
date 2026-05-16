@@ -1,0 +1,1270 @@
+{
+ "attack_steps": [
+  {
+   "container": "doomla-workstation-1",
+   "label": "recon: passwd",
+   "cmd": "cat /etc/passwd >/dev/null",
+   "alert_count": 0,
+   "rules": [],
+   "priorities": [],
+   "ts": 1778841657.9421227
+  },
+  {
+   "container": "doomla-workstation-1",
+   "label": "recon: shadow",
+   "cmd": "cat /etc/shadow >/dev/null",
+   "alert_count": 1,
+   "rules": [
+    "Read sensitive file untrusted"
+   ],
+   "priorities": [
+    "Warning"
+   ],
+   "ts": 1778841660.0962834
+  },
+  {
+   "container": "doomla-workstation-1",
+   "label": "cred-hunt: find",
+   "cmd": "find / -maxdepth 5 -name \"id_rsa\" 2>/dev/null >/dev/null",
+   "alert_count": 1,
+   "rules": [
+    "Search Private Keys or Passwords"
+   ],
+   "priorities": [
+    "Warning"
+   ],
+   "ts": 1778841662.2345889
+  },
+  {
+   "container": "doomla-workstation-1",
+   "label": "cred-hunt: grep",
+   "cmd": "grep -r \"BEGIN OPENSSH PRIVATE\" /home 2>/dev/null >/dev/null; grep -r \"BEGIN OPENSSH PRIVATE\" /etc 2>/dev/null >/dev/null",
+   "alert_count": 25,
+   "rules": [
+    "Search Private Keys or Passwords",
+    "Search Private Keys or Passwords",
+    "Read sensitive file untrusted",
+    "Read sensitive file untrusted",
+    "Read sensitive file untrusted",
+    "Read sensitive file untrusted",
+    "Read sensitive file untrusted",
+    "Read sensitive file untrusted",
+    "Read sensitive file untrusted",
+    "Read sensitive file untrusted",
+    "Read sensitive file untrusted",
+    "Read sensitive file untrusted",
+    "Read sensitive file untrusted",
+    "Read sensitive file untrusted",
+    "Read sensitive file untrusted",
+    "Read sensitive file untrusted",
+    "Read sensitive file untrusted",
+    "Read sensitive file untrusted",
+    "Read sensitive file untrusted",
+    "Read sensitive file untrusted",
+    "Read sensitive file untrusted",
+    "Read sensitive file untrusted",
+    "Read sensitive file untrusted",
+    "Read sensitive file untrusted",
+    "Read sensitive file untrusted"
+   ],
+   "priorities": [
+    "Warning",
+    "Warning",
+    "Warning",
+    "Warning",
+    "Warning",
+    "Warning",
+    "Warning",
+    "Warning",
+    "Warning",
+    "Warning",
+    "Warning",
+    "Warning",
+    "Warning",
+    "Warning",
+    "Warning",
+    "Warning",
+    "Warning",
+    "Warning",
+    "Warning",
+    "Warning",
+    "Warning",
+    "Warning",
+    "Warning",
+    "Warning",
+    "Warning"
+   ],
+   "ts": 1778841664.7622404
+  },
+  {
+   "container": "doomla-workstation-1",
+   "label": "persist: hardlink",
+   "cmd": "ln /etc/shadow /tmp/shadow_link 2>/dev/null; rm -f /tmp/shadow_link",
+   "alert_count": 1,
+   "rules": [
+    "Create Hardlink Over Sensitive Files"
+   ],
+   "priorities": [
+    "Warning"
+   ],
+   "ts": 1778841666.9552488
+  },
+  {
+   "container": "doomla-workstation-1",
+   "label": "persist: symlink",
+   "cmd": "ln -s /etc/shadow /tmp/shadow_sym 2>/dev/null; rm -f /tmp/shadow_sym",
+   "alert_count": 1,
+   "rules": [
+    "Create Symlink Over Sensitive Files"
+   ],
+   "priorities": [
+    "Warning"
+   ],
+   "ts": 1778841669.092972
+  },
+  {
+   "container": "doomla-vpn-1",
+   "label": "recon: shadow",
+   "cmd": "cat /etc/shadow >/dev/null",
+   "alert_count": 1,
+   "rules": [
+    "Read sensitive file untrusted"
+   ],
+   "priorities": [
+    "Warning"
+   ],
+   "ts": 1778841671.2346346
+  },
+  {
+   "container": "doomla-vpn-1",
+   "label": "cred-hunt: find",
+   "cmd": "find / -maxdepth 5 -name \"id_rsa\" 2>/dev/null >/dev/null",
+   "alert_count": 1,
+   "rules": [
+    "Search Private Keys or Passwords"
+   ],
+   "priorities": [
+    "Warning"
+   ],
+   "ts": 1778841673.367115
+  },
+  {
+   "container": "doomla-vpn-1",
+   "label": "shell: bash -i",
+   "cmd": "echo done | bash -i 2>/dev/null >/dev/null",
+   "alert_count": 0,
+   "rules": [],
+   "priorities": [],
+   "ts": 1778841675.826793
+  },
+  {
+   "container": "doomla-web-1",
+   "label": "recon: shadow",
+   "cmd": "cat /etc/shadow >/dev/null",
+   "alert_count": 1,
+   "rules": [
+    "Read sensitive file untrusted"
+   ],
+   "priorities": [
+    "Warning"
+   ],
+   "ts": 1778841677.9790535
+  },
+  {
+   "container": "doomla-web-1",
+   "label": "recon: sensitive",
+   "cmd": "cat /etc/sudoers >/dev/null 2>&1; cat /root/.ssh/id_rsa 2>/dev/null",
+   "alert_count": 0,
+   "rules": [],
+   "priorities": [],
+   "ts": 1778841680.116233
+  },
+  {
+   "container": "doomla-web-1",
+   "label": "noise: packet sock",
+   "cmd": "python3 -c \"import socket; socket.socket(socket.AF_PACKET, socket.SOCK_RAW, 0)\" 2>/dev/null || true",
+   "alert_count": 0,
+   "rules": [],
+   "priorities": [],
+   "ts": 1778841682.254767
+  }
+ ],
+ "all_alerts": [
+  {
+   "hostname": "44bd4473586b",
+   "output": "10:41:00.161112438: Warning Sensitive file opened for reading by non-trusted program (file=/etc/shadow gparent=containerd-shim ggparent=systemd gggparent=<NA> evt_type=openat user=root user_uid=0 user_loginuid=-1 process=cat proc_exepath=/usr/bin/cat parent=bash command=cat /etc/shadow terminal=0 container_id=b9e6382d8da7 container_name=doomla-workstation-1)",
+   "output_fields": {
+    "container.id": "b9e6382d8da7",
+    "container.name": "doomla-workstation-1",
+    "evt.time": 1778841660161112438,
+    "evt.type": "openat",
+    "fd.name": "/etc/shadow",
+    "proc.aname[2]": "containerd-shim",
+    "proc.aname[3]": "systemd",
+    "proc.aname[4]": null,
+    "proc.cmdline": "cat /etc/shadow",
+    "proc.exepath": "/usr/bin/cat",
+    "proc.name": "cat",
+    "proc.pname": "bash",
+    "proc.tty": 0,
+    "user.loginuid": -1,
+    "user.name": "root",
+    "user.uid": 0
+   },
+   "priority": "Warning",
+   "rule": "Read sensitive file untrusted",
+   "source": "syscall",
+   "tags": [
+    "T1555",
+    "container",
+    "filesystem",
+    "host",
+    "maturity_stable",
+    "mitre_credential_access"
+   ],
+   "time": "2026-05-15T10:41:00.161112438Z"
+  },
+  {
+   "hostname": "44bd4473586b",
+   "output": "10:41:02.299318056: Warning Grep private keys or passwords activities found (evt_type=execve user=root user_uid=0 user_loginuid=-1 process=find proc_exepath=/usr/bin/find parent=bash command=find / -maxdepth 5 -name id_rsa terminal=0 exe_flags=EXE_WRITABLE|EXE_LOWER_LAYER container_id=b9e6382d8da7 container_name=doomla-workstation-1)",
+   "output_fields": {
+    "container.id": "b9e6382d8da7",
+    "container.name": "doomla-workstation-1",
+    "evt.arg.flags": "EXE_WRITABLE|EXE_LOWER_LAYER",
+    "evt.time": 1778841662299318056,
+    "evt.type": "execve",
+    "proc.cmdline": "find / -maxdepth 5 -name id_rsa",
+    "proc.exepath": "/usr/bin/find",
+    "proc.name": "find",
+    "proc.pname": "bash",
+    "proc.tty": 0,
+    "user.loginuid": -1,
+    "user.name": "root",
+    "user.uid": 0
+   },
+   "priority": "Warning",
+   "rule": "Search Private Keys or Passwords",
+   "source": "syscall",
+   "tags": [
+    "T1552.001",
+    "container",
+    "filesystem",
+    "host",
+    "maturity_stable",
+    "mitre_credential_access",
+    "process"
+   ],
+   "time": "2026-05-15T10:41:02.299318056Z"
+  },
+  {
+   "hostname": "44bd4473586b",
+   "output": "10:41:04.831952954: Warning Grep private keys or passwords activities found (evt_type=execve user=root user_uid=0 user_loginuid=-1 process=grep proc_exepath=/usr/bin/grep parent=bash command=grep -r BEGIN OPENSSH PRIVATE /home terminal=0 exe_flags=EXE_WRITABLE|EXE_LOWER_LAYER container_id=b9e6382d8da7 container_name=doomla-workstation-1)",
+   "output_fields": {
+    "container.id": "b9e6382d8da7",
+    "container.name": "doomla-workstation-1",
+    "evt.arg.flags": "EXE_WRITABLE|EXE_LOWER_LAYER",
+    "evt.time": 1778841664831952954,
+    "evt.type": "execve",
+    "proc.cmdline": "grep -r BEGIN OPENSSH PRIVATE /home",
+    "proc.exepath": "/usr/bin/grep",
+    "proc.name": "grep",
+    "proc.pname": "bash",
+    "proc.tty": 0,
+    "user.loginuid": -1,
+    "user.name": "root",
+    "user.uid": 0
+   },
+   "priority": "Warning",
+   "rule": "Search Private Keys or Passwords",
+   "source": "syscall",
+   "tags": [
+    "T1552.001",
+    "container",
+    "filesystem",
+    "host",
+    "maturity_stable",
+    "mitre_credential_access",
+    "process"
+   ],
+   "time": "2026-05-15T10:41:04.831952954Z"
+  },
+  {
+   "hostname": "44bd4473586b",
+   "output": "10:41:04.838026440: Warning Grep private keys or passwords activities found (evt_type=execve user=root user_uid=0 user_loginuid=-1 process=grep proc_exepath=/usr/bin/grep parent=bash command=grep -r BEGIN OPENSSH PRIVATE /etc terminal=0 exe_flags=EXE_WRITABLE|EXE_LOWER_LAYER container_id=b9e6382d8da7 container_name=doomla-workstation-1)",
+   "output_fields": {
+    "container.id": "b9e6382d8da7",
+    "container.name": "doomla-workstation-1",
+    "evt.arg.flags": "EXE_WRITABLE|EXE_LOWER_LAYER",
+    "evt.time": 1778841664838026440,
+    "evt.type": "execve",
+    "proc.cmdline": "grep -r BEGIN OPENSSH PRIVATE /etc",
+    "proc.exepath": "/usr/bin/grep",
+    "proc.name": "grep",
+    "proc.pname": "bash",
+    "proc.tty": 0,
+    "user.loginuid": -1,
+    "user.name": "root",
+    "user.uid": 0
+   },
+   "priority": "Warning",
+   "rule": "Search Private Keys or Passwords",
+   "source": "syscall",
+   "tags": [
+    "T1552.001",
+    "container",
+    "filesystem",
+    "host",
+    "maturity_stable",
+    "mitre_credential_access",
+    "process"
+   ],
+   "time": "2026-05-15T10:41:04.838026440Z"
+  },
+  {
+   "hostname": "44bd4473586b",
+   "output": "10:41:04.841913137: Warning Sensitive file opened for reading by non-trusted program (file=/etc/shadow gparent=containerd-shim ggparent=systemd gggparent=<NA> evt_type=openat user=root user_uid=0 user_loginuid=-1 process=grep proc_exepath=/usr/bin/grep parent=bash command=grep -r BEGIN OPENSSH PRIVATE /etc terminal=0 container_id=b9e6382d8da7 container_name=doomla-workstation-1)",
+   "output_fields": {
+    "container.id": "b9e6382d8da7",
+    "container.name": "doomla-workstation-1",
+    "evt.time": 1778841664841913137,
+    "evt.type": "openat",
+    "fd.name": "/etc/shadow",
+    "proc.aname[2]": "containerd-shim",
+    "proc.aname[3]": "systemd",
+    "proc.aname[4]": null,
+    "proc.cmdline": "grep -r BEGIN OPENSSH PRIVATE /etc",
+    "proc.exepath": "/usr/bin/grep",
+    "proc.name": "grep",
+    "proc.pname": "bash",
+    "proc.tty": 0,
+    "user.loginuid": -1,
+    "user.name": "root",
+    "user.uid": 0
+   },
+   "priority": "Warning",
+   "rule": "Read sensitive file untrusted",
+   "source": "syscall",
+   "tags": [
+    "T1555",
+    "container",
+    "filesystem",
+    "host",
+    "maturity_stable",
+    "mitre_credential_access"
+   ],
+   "time": "2026-05-15T10:41:04.841913137Z"
+  },
+  {
+   "hostname": "44bd4473586b",
+   "output": "10:41:04.842934245: Warning Sensitive file opened for reading by non-trusted program (file=/etc/pam.d/common-session-noninteractive gparent=containerd-shim ggparent=systemd gggparent=<NA> evt_type=openat user=root user_uid=0 user_loginuid=-1 process=grep proc_exepath=/usr/bin/grep parent=bash command=grep -r BEGIN OPENSSH PRIVATE /etc terminal=0 container_id=b9e6382d8da7 container_name=doomla-workstation-1)",
+   "output_fields": {
+    "container.id": "b9e6382d8da7",
+    "container.name": "doomla-workstation-1",
+    "evt.time": 1778841664842934245,
+    "evt.type": "openat",
+    "fd.name": "/etc/pam.d/common-session-noninteractive",
+    "proc.aname[2]": "containerd-shim",
+    "proc.aname[3]": "systemd",
+    "proc.aname[4]": null,
+    "proc.cmdline": "grep -r BEGIN OPENSSH PRIVATE /etc",
+    "proc.exepath": "/usr/bin/grep",
+    "proc.name": "grep",
+    "proc.pname": "bash",
+    "proc.tty": 0,
+    "user.loginuid": -1,
+    "user.name": "root",
+    "user.uid": 0
+   },
+   "priority": "Warning",
+   "rule": "Read sensitive file untrusted",
+   "source": "syscall",
+   "tags": [
+    "T1555",
+    "container",
+    "filesystem",
+    "host",
+    "maturity_stable",
+    "mitre_credential_access"
+   ],
+   "time": "2026-05-15T10:41:04.842934245Z"
+  },
+  {
+   "hostname": "44bd4473586b",
+   "output": "10:41:04.843280365: Warning Sensitive file opened for reading by non-trusted program (file=/etc/pam.d/su-l gparent=containerd-shim ggparent=systemd gggparent=<NA> evt_type=openat user=root user_uid=0 user_loginuid=-1 process=grep proc_exepath=/usr/bin/grep parent=bash command=grep -r BEGIN OPENSSH PRIVATE /etc terminal=0 container_id=b9e6382d8da7 container_name=doomla-workstation-1)",
+   "output_fields": {
+    "container.id": "b9e6382d8da7",
+    "container.name": "doomla-workstation-1",
+    "evt.time": 1778841664843280365,
+    "evt.type": "openat",
+    "fd.name": "/etc/pam.d/su-l",
+    "proc.aname[2]": "containerd-shim",
+    "proc.aname[3]": "systemd",
+    "proc.aname[4]": null,
+    "proc.cmdline": "grep -r BEGIN OPENSSH PRIVATE /etc",
+    "proc.exepath": "/usr/bin/grep",
+    "proc.name": "grep",
+    "proc.pname": "bash",
+    "proc.tty": 0,
+    "user.loginuid": -1,
+    "user.name": "root",
+    "user.uid": 0
+   },
+   "priority": "Warning",
+   "rule": "Read sensitive file untrusted",
+   "source": "syscall",
+   "tags": [
+    "T1555",
+    "container",
+    "filesystem",
+    "host",
+    "maturity_stable",
+    "mitre_credential_access"
+   ],
+   "time": "2026-05-15T10:41:04.843280365Z"
+  },
+  {
+   "hostname": "44bd4473586b",
+   "output": "10:41:04.843543338: Warning Sensitive file opened for reading by non-trusted program (file=/etc/pam.d/other gparent=containerd-shim ggparent=systemd gggparent=<NA> evt_type=openat user=root user_uid=0 user_loginuid=-1 process=grep proc_exepath=/usr/bin/grep parent=bash command=grep -r BEGIN OPENSSH PRIVATE /etc terminal=0 container_id=b9e6382d8da7 container_name=doomla-workstation-1)",
+   "output_fields": {
+    "container.id": "b9e6382d8da7",
+    "container.name": "doomla-workstation-1",
+    "evt.time": 1778841664843543338,
+    "evt.type": "openat",
+    "fd.name": "/etc/pam.d/other",
+    "proc.aname[2]": "containerd-shim",
+    "proc.aname[3]": "systemd",
+    "proc.aname[4]": null,
+    "proc.cmdline": "grep -r BEGIN OPENSSH PRIVATE /etc",
+    "proc.exepath": "/usr/bin/grep",
+    "proc.name": "grep",
+    "proc.pname": "bash",
+    "proc.tty": 0,
+    "user.loginuid": -1,
+    "user.name": "root",
+    "user.uid": 0
+   },
+   "priority": "Warning",
+   "rule": "Read sensitive file untrusted",
+   "source": "syscall",
+   "tags": [
+    "T1555",
+    "container",
+    "filesystem",
+    "host",
+    "maturity_stable",
+    "mitre_credential_access"
+   ],
+   "time": "2026-05-15T10:41:04.843543338Z"
+  },
+  {
+   "hostname": "44bd4473586b",
+   "output": "10:41:04.843765527: Warning Sensitive file opened for reading by non-trusted program (file=/etc/pam.d/passwd gparent=containerd-shim ggparent=systemd gggparent=<NA> evt_type=openat user=root user_uid=0 user_loginuid=-1 process=grep proc_exepath=/usr/bin/grep parent=bash command=grep -r BEGIN OPENSSH PRIVATE /etc terminal=0 container_id=b9e6382d8da7 container_name=doomla-workstation-1)",
+   "output_fields": {
+    "container.id": "b9e6382d8da7",
+    "container.name": "doomla-workstation-1",
+    "evt.time": 1778841664843765527,
+    "evt.type": "openat",
+    "fd.name": "/etc/pam.d/passwd",
+    "proc.aname[2]": "containerd-shim",
+    "proc.aname[3]": "systemd",
+    "proc.aname[4]": null,
+    "proc.cmdline": "grep -r BEGIN OPENSSH PRIVATE /etc",
+    "proc.exepath": "/usr/bin/grep",
+    "proc.name": "grep",
+    "proc.pname": "bash",
+    "proc.tty": 0,
+    "user.loginuid": -1,
+    "user.name": "root",
+    "user.uid": 0
+   },
+   "priority": "Warning",
+   "rule": "Read sensitive file untrusted",
+   "source": "syscall",
+   "tags": [
+    "T1555",
+    "container",
+    "filesystem",
+    "host",
+    "maturity_stable",
+    "mitre_credential_access"
+   ],
+   "time": "2026-05-15T10:41:04.843765527Z"
+  },
+  {
+   "hostname": "44bd4473586b",
+   "output": "10:41:04.843996097: Warning Sensitive file opened for reading by non-trusted program (file=/etc/pam.d/common-session gparent=containerd-shim ggparent=systemd gggparent=<NA> evt_type=openat user=root user_uid=0 user_loginuid=-1 process=grep proc_exepath=/usr/bin/grep parent=bash command=grep -r BEGIN OPENSSH PRIVATE /etc terminal=0 container_id=b9e6382d8da7 container_name=doomla-workstation-1)",
+   "output_fields": {
+    "container.id": "b9e6382d8da7",
+    "container.name": "doomla-workstation-1",
+    "evt.time": 1778841664843996097,
+    "evt.type": "openat",
+    "fd.name": "/etc/pam.d/common-session",
+    "proc.aname[2]": "containerd-shim",
+    "proc.aname[3]": "systemd",
+    "proc.aname[4]": null,
+    "proc.cmdline": "grep -r BEGIN OPENSSH PRIVATE /etc",
+    "proc.exepath": "/usr/bin/grep",
+    "proc.name": "grep",
+    "proc.pname": "bash",
+    "proc.tty": 0,
+    "user.loginuid": -1,
+    "user.name": "root",
+    "user.uid": 0
+   },
+   "priority": "Warning",
+   "rule": "Read sensitive file untrusted",
+   "source": "syscall",
+   "tags": [
+    "T1555",
+    "container",
+    "filesystem",
+    "host",
+    "maturity_stable",
+    "mitre_credential_access"
+   ],
+   "time": "2026-05-15T10:41:04.843996097Z"
+  },
+  {
+   "hostname": "44bd4473586b",
+   "output": "10:41:04.844301674: Warning Sensitive file opened for reading by non-trusted program (file=/etc/pam.d/common-account gparent=containerd-shim ggparent=systemd gggparent=<NA> evt_type=openat user=root user_uid=0 user_loginuid=-1 process=grep proc_exepath=/usr/bin/grep parent=bash command=grep -r BEGIN OPENSSH PRIVATE /etc terminal=0 container_id=b9e6382d8da7 container_name=doomla-workstation-1)",
+   "output_fields": {
+    "container.id": "b9e6382d8da7",
+    "container.name": "doomla-workstation-1",
+    "evt.time": 1778841664844301674,
+    "evt.type": "openat",
+    "fd.name": "/etc/pam.d/common-account",
+    "proc.aname[2]": "containerd-shim",
+    "proc.aname[3]": "systemd",
+    "proc.aname[4]": null,
+    "proc.cmdline": "grep -r BEGIN OPENSSH PRIVATE /etc",
+    "proc.exepath": "/usr/bin/grep",
+    "proc.name": "grep",
+    "proc.pname": "bash",
+    "proc.tty": 0,
+    "user.loginuid": -1,
+    "user.name": "root",
+    "user.uid": 0
+   },
+   "priority": "Warning",
+   "rule": "Read sensitive file untrusted",
+   "source": "syscall",
+   "tags": [
+    "T1555",
+    "container",
+    "filesystem",
+    "host",
+    "maturity_stable",
+    "mitre_credential_access"
+   ],
+   "time": "2026-05-15T10:41:04.844301674Z"
+  },
+  {
+   "hostname": "44bd4473586b",
+   "output": "10:41:04.844561886: Warning Sensitive file opened for reading by non-trusted program (file=/etc/pam.d/su gparent=containerd-shim ggparent=systemd gggparent=<NA> evt_type=openat user=root user_uid=0 user_loginuid=-1 process=grep proc_exepath=/usr/bin/grep parent=bash command=grep -r BEGIN OPENSSH PRIVATE /etc terminal=0 container_id=b9e6382d8da7 container_name=doomla-workstation-1)",
+   "output_fields": {
+    "container.id": "b9e6382d8da7",
+    "container.name": "doomla-workstation-1",
+    "evt.time": 1778841664844561886,
+    "evt.type": "openat",
+    "fd.name": "/etc/pam.d/su",
+    "proc.aname[2]": "containerd-shim",
+    "proc.aname[3]": "systemd",
+    "proc.aname[4]": null,
+    "proc.cmdline": "grep -r BEGIN OPENSSH PRIVATE /etc",
+    "proc.exepath": "/usr/bin/grep",
+    "proc.name": "grep",
+    "proc.pname": "bash",
+    "proc.tty": 0,
+    "user.loginuid": -1,
+    "user.name": "root",
+    "user.uid": 0
+   },
+   "priority": "Warning",
+   "rule": "Read sensitive file untrusted",
+   "source": "syscall",
+   "tags": [
+    "T1555",
+    "container",
+    "filesystem",
+    "host",
+    "maturity_stable",
+    "mitre_credential_access"
+   ],
+   "time": "2026-05-15T10:41:04.844561886Z"
+  },
+  {
+   "hostname": "44bd4473586b",
+   "output": "10:41:04.844887514: Warning Sensitive file opened for reading by non-trusted program (file=/etc/pam.d/runuser-l gparent=containerd-shim ggparent=systemd gggparent=<NA> evt_type=openat user=root user_uid=0 user_loginuid=-1 process=grep proc_exepath=/usr/bin/grep parent=bash command=grep -r BEGIN OPENSSH PRIVATE /etc terminal=0 container_id=b9e6382d8da7 container_name=doomla-workstation-1)",
+   "output_fields": {
+    "container.id": "b9e6382d8da7",
+    "container.name": "doomla-workstation-1",
+    "evt.time": 1778841664844887514,
+    "evt.type": "openat",
+    "fd.name": "/etc/pam.d/runuser-l",
+    "proc.aname[2]": "containerd-shim",
+    "proc.aname[3]": "systemd",
+    "proc.aname[4]": null,
+    "proc.cmdline": "grep -r BEGIN OPENSSH PRIVATE /etc",
+    "proc.exepath": "/usr/bin/grep",
+    "proc.name": "grep",
+    "proc.pname": "bash",
+    "proc.tty": 0,
+    "user.loginuid": -1,
+    "user.name": "root",
+    "user.uid": 0
+   },
+   "priority": "Warning",
+   "rule": "Read sensitive file untrusted",
+   "source": "syscall",
+   "tags": [
+    "T1555",
+    "container",
+    "filesystem",
+    "host",
+    "maturity_stable",
+    "mitre_credential_access"
+   ],
+   "time": "2026-05-15T10:41:04.844887514Z"
+  },
+  {
+   "hostname": "44bd4473586b",
+   "output": "10:41:04.845103933: Warning Sensitive file opened for reading by non-trusted program (file=/etc/pam.d/newusers gparent=containerd-shim ggparent=systemd gggparent=<NA> evt_type=openat user=root user_uid=0 user_loginuid=-1 process=grep proc_exepath=/usr/bin/grep parent=bash command=grep -r BEGIN OPENSSH PRIVATE /etc terminal=0 container_id=b9e6382d8da7 container_name=doomla-workstation-1)",
+   "output_fields": {
+    "container.id": "b9e6382d8da7",
+    "container.name": "doomla-workstation-1",
+    "evt.time": 1778841664845103933,
+    "evt.type": "openat",
+    "fd.name": "/etc/pam.d/newusers",
+    "proc.aname[2]": "containerd-shim",
+    "proc.aname[3]": "systemd",
+    "proc.aname[4]": null,
+    "proc.cmdline": "grep -r BEGIN OPENSSH PRIVATE /etc",
+    "proc.exepath": "/usr/bin/grep",
+    "proc.name": "grep",
+    "proc.pname": "bash",
+    "proc.tty": 0,
+    "user.loginuid": -1,
+    "user.name": "root",
+    "user.uid": 0
+   },
+   "priority": "Warning",
+   "rule": "Read sensitive file untrusted",
+   "source": "syscall",
+   "tags": [
+    "T1555",
+    "container",
+    "filesystem",
+    "host",
+    "maturity_stable",
+    "mitre_credential_access"
+   ],
+   "time": "2026-05-15T10:41:04.845103933Z"
+  },
+  {
+   "hostname": "44bd4473586b",
+   "output": "10:41:04.845311181: Warning Sensitive file opened for reading by non-trusted program (file=/etc/pam.d/common-auth gparent=containerd-shim ggparent=systemd gggparent=<NA> evt_type=openat user=root user_uid=0 user_loginuid=-1 process=grep proc_exepath=/usr/bin/grep parent=bash command=grep -r BEGIN OPENSSH PRIVATE /etc terminal=0 container_id=b9e6382d8da7 container_name=doomla-workstation-1)",
+   "output_fields": {
+    "container.id": "b9e6382d8da7",
+    "container.name": "doomla-workstation-1",
+    "evt.time": 1778841664845311181,
+    "evt.type": "openat",
+    "fd.name": "/etc/pam.d/common-auth",
+    "proc.aname[2]": "containerd-shim",
+    "proc.aname[3]": "systemd",
+    "proc.aname[4]": null,
+    "proc.cmdline": "grep -r BEGIN OPENSSH PRIVATE /etc",
+    "proc.exepath": "/usr/bin/grep",
+    "proc.name": "grep",
+    "proc.pname": "bash",
+    "proc.tty": 0,
+    "user.loginuid": -1,
+    "user.name": "root",
+    "user.uid": 0
+   },
+   "priority": "Warning",
+   "rule": "Read sensitive file untrusted",
+   "source": "syscall",
+   "tags": [
+    "T1555",
+    "container",
+    "filesystem",
+    "host",
+    "maturity_stable",
+    "mitre_credential_access"
+   ],
+   "time": "2026-05-15T10:41:04.845311181Z"
+  },
+  {
+   "hostname": "44bd4473586b",
+   "output": "10:41:04.845545801: Warning Sensitive file opened for reading by non-trusted program (file=/etc/pam.d/runuser gparent=containerd-shim ggparent=systemd gggparent=<NA> evt_type=openat user=root user_uid=0 user_loginuid=-1 process=grep proc_exepath=/usr/bin/grep parent=bash command=grep -r BEGIN OPENSSH PRIVATE /etc terminal=0 container_id=b9e6382d8da7 container_name=doomla-workstation-1)",
+   "output_fields": {
+    "container.id": "b9e6382d8da7",
+    "container.name": "doomla-workstation-1",
+    "evt.time": 1778841664845545801,
+    "evt.type": "openat",
+    "fd.name": "/etc/pam.d/runuser",
+    "proc.aname[2]": "containerd-shim",
+    "proc.aname[3]": "systemd",
+    "proc.aname[4]": null,
+    "proc.cmdline": "grep -r BEGIN OPENSSH PRIVATE /etc",
+    "proc.exepath": "/usr/bin/grep",
+    "proc.name": "grep",
+    "proc.pname": "bash",
+    "proc.tty": 0,
+    "user.loginuid": -1,
+    "user.name": "root",
+    "user.uid": 0
+   },
+   "priority": "Warning",
+   "rule": "Read sensitive file untrusted",
+   "source": "syscall",
+   "tags": [
+    "T1555",
+    "container",
+    "filesystem",
+    "host",
+    "maturity_stable",
+    "mitre_credential_access"
+   ],
+   "time": "2026-05-15T10:41:04.845545801Z"
+  },
+  {
+   "hostname": "44bd4473586b",
+   "output": "10:41:04.845793503: Warning Sensitive file opened for reading by non-trusted program (file=/etc/pam.d/chsh gparent=containerd-shim ggparent=systemd gggparent=<NA> evt_type=openat user=root user_uid=0 user_loginuid=-1 process=grep proc_exepath=/usr/bin/grep parent=bash command=grep -r BEGIN OPENSSH PRIVATE /etc terminal=0 container_id=b9e6382d8da7 container_name=doomla-workstation-1)",
+   "output_fields": {
+    "container.id": "b9e6382d8da7",
+    "container.name": "doomla-workstation-1",
+    "evt.time": 1778841664845793503,
+    "evt.type": "openat",
+    "fd.name": "/etc/pam.d/chsh",
+    "proc.aname[2]": "containerd-shim",
+    "proc.aname[3]": "systemd",
+    "proc.aname[4]": null,
+    "proc.cmdline": "grep -r BEGIN OPENSSH PRIVATE /etc",
+    "proc.exepath": "/usr/bin/grep",
+    "proc.name": "grep",
+    "proc.pname": "bash",
+    "proc.tty": 0,
+    "user.loginuid": -1,
+    "user.name": "root",
+    "user.uid": 0
+   },
+   "priority": "Warning",
+   "rule": "Read sensitive file untrusted",
+   "source": "syscall",
+   "tags": [
+    "T1555",
+    "container",
+    "filesystem",
+    "host",
+    "maturity_stable",
+    "mitre_credential_access"
+   ],
+   "time": "2026-05-15T10:41:04.845793503Z"
+  },
+  {
+   "hostname": "44bd4473586b",
+   "output": "10:41:04.846043354: Warning Sensitive file opened for reading by non-trusted program (file=/etc/pam.d/common-password gparent=containerd-shim ggparent=systemd gggparent=<NA> evt_type=openat user=root user_uid=0 user_loginuid=-1 process=grep proc_exepath=/usr/bin/grep parent=bash command=grep -r BEGIN OPENSSH PRIVATE /etc terminal=0 container_id=b9e6382d8da7 container_name=doomla-workstation-1)",
+   "output_fields": {
+    "container.id": "b9e6382d8da7",
+    "container.name": "doomla-workstation-1",
+    "evt.time": 1778841664846043354,
+    "evt.type": "openat",
+    "fd.name": "/etc/pam.d/common-password",
+    "proc.aname[2]": "containerd-shim",
+    "proc.aname[3]": "systemd",
+    "proc.aname[4]": null,
+    "proc.cmdline": "grep -r BEGIN OPENSSH PRIVATE /etc",
+    "proc.exepath": "/usr/bin/grep",
+    "proc.name": "grep",
+    "proc.pname": "bash",
+    "proc.tty": 0,
+    "user.loginuid": -1,
+    "user.name": "root",
+    "user.uid": 0
+   },
+   "priority": "Warning",
+   "rule": "Read sensitive file untrusted",
+   "source": "syscall",
+   "tags": [
+    "T1555",
+    "container",
+    "filesystem",
+    "host",
+    "maturity_stable",
+    "mitre_credential_access"
+   ],
+   "time": "2026-05-15T10:41:04.846043354Z"
+  },
+  {
+   "hostname": "44bd4473586b",
+   "output": "10:41:04.846321438: Warning Sensitive file opened for reading by non-trusted program (file=/etc/pam.d/login gparent=containerd-shim ggparent=systemd gggparent=<NA> evt_type=openat user=root user_uid=0 user_loginuid=-1 process=grep proc_exepath=/usr/bin/grep parent=bash command=grep -r BEGIN OPENSSH PRIVATE /etc terminal=0 container_id=b9e6382d8da7 container_name=doomla-workstation-1)",
+   "output_fields": {
+    "container.id": "b9e6382d8da7",
+    "container.name": "doomla-workstation-1",
+    "evt.time": 1778841664846321438,
+    "evt.type": "openat",
+    "fd.name": "/etc/pam.d/login",
+    "proc.aname[2]": "containerd-shim",
+    "proc.aname[3]": "systemd",
+    "proc.aname[4]": null,
+    "proc.cmdline": "grep -r BEGIN OPENSSH PRIVATE /etc",
+    "proc.exepath": "/usr/bin/grep",
+    "proc.name": "grep",
+    "proc.pname": "bash",
+    "proc.tty": 0,
+    "user.loginuid": -1,
+    "user.name": "root",
+    "user.uid": 0
+   },
+   "priority": "Warning",
+   "rule": "Read sensitive file untrusted",
+   "source": "syscall",
+   "tags": [
+    "T1555",
+    "container",
+    "filesystem",
+    "host",
+    "maturity_stable",
+    "mitre_credential_access"
+   ],
+   "time": "2026-05-15T10:41:04.846321438Z"
+  },
+  {
+   "hostname": "44bd4473586b",
+   "output": "10:41:04.846540577: Warning Sensitive file opened for reading by non-trusted program (file=/etc/pam.d/chfn gparent=containerd-shim ggparent=systemd gggparent=<NA> evt_type=openat user=root user_uid=0 user_loginuid=-1 process=grep proc_exepath=/usr/bin/grep parent=bash command=grep -r BEGIN OPENSSH PRIVATE /etc terminal=0 container_id=b9e6382d8da7 container_name=doomla-workstation-1)",
+   "output_fields": {
+    "container.id": "b9e6382d8da7",
+    "container.name": "doomla-workstation-1",
+    "evt.time": 1778841664846540577,
+    "evt.type": "openat",
+    "fd.name": "/etc/pam.d/chfn",
+    "proc.aname[2]": "containerd-shim",
+    "proc.aname[3]": "systemd",
+    "proc.aname[4]": null,
+    "proc.cmdline": "grep -r BEGIN OPENSSH PRIVATE /etc",
+    "proc.exepath": "/usr/bin/grep",
+    "proc.name": "grep",
+    "proc.pname": "bash",
+    "proc.tty": 0,
+    "user.loginuid": -1,
+    "user.name": "root",
+    "user.uid": 0
+   },
+   "priority": "Warning",
+   "rule": "Read sensitive file untrusted",
+   "source": "syscall",
+   "tags": [
+    "T1555",
+    "container",
+    "filesystem",
+    "host",
+    "maturity_stable",
+    "mitre_credential_access"
+   ],
+   "time": "2026-05-15T10:41:04.846540577Z"
+  },
+  {
+   "hostname": "44bd4473586b",
+   "output": "10:41:04.846748555: Warning Sensitive file opened for reading by non-trusted program (file=/etc/pam.d/chpasswd gparent=containerd-shim ggparent=systemd gggparent=<NA> evt_type=openat user=root user_uid=0 user_loginuid=-1 process=grep proc_exepath=/usr/bin/grep parent=bash command=grep -r BEGIN OPENSSH PRIVATE /etc terminal=0 container_id=b9e6382d8da7 container_name=doomla-workstation-1)",
+   "output_fields": {
+    "container.id": "b9e6382d8da7",
+    "container.name": "doomla-workstation-1",
+    "evt.time": 1778841664846748555,
+    "evt.type": "openat",
+    "fd.name": "/etc/pam.d/chpasswd",
+    "proc.aname[2]": "containerd-shim",
+    "proc.aname[3]": "systemd",
+    "proc.aname[4]": null,
+    "proc.cmdline": "grep -r BEGIN OPENSSH PRIVATE /etc",
+    "proc.exepath": "/usr/bin/grep",
+    "proc.name": "grep",
+    "proc.pname": "bash",
+    "proc.tty": 0,
+    "user.loginuid": -1,
+    "user.name": "root",
+    "user.uid": 0
+   },
+   "priority": "Warning",
+   "rule": "Read sensitive file untrusted",
+   "source": "syscall",
+   "tags": [
+    "T1555",
+    "container",
+    "filesystem",
+    "host",
+    "maturity_stable",
+    "mitre_credential_access"
+   ],
+   "time": "2026-05-15T10:41:04.846748555Z"
+  },
+  {
+   "hostname": "44bd4473586b",
+   "output": "10:41:04.846950933: Warning Sensitive file opened for reading by non-trusted program (file=/etc/pam.d/sshd gparent=containerd-shim ggparent=systemd gggparent=<NA> evt_type=openat user=root user_uid=0 user_loginuid=-1 process=grep proc_exepath=/usr/bin/grep parent=bash command=grep -r BEGIN OPENSSH PRIVATE /etc terminal=0 container_id=b9e6382d8da7 container_name=doomla-workstation-1)",
+   "output_fields": {
+    "container.id": "b9e6382d8da7",
+    "container.name": "doomla-workstation-1",
+    "evt.time": 1778841664846950933,
+    "evt.type": "openat",
+    "fd.name": "/etc/pam.d/sshd",
+    "proc.aname[2]": "containerd-shim",
+    "proc.aname[3]": "systemd",
+    "proc.aname[4]": null,
+    "proc.cmdline": "grep -r BEGIN OPENSSH PRIVATE /etc",
+    "proc.exepath": "/usr/bin/grep",
+    "proc.name": "grep",
+    "proc.pname": "bash",
+    "proc.tty": 0,
+    "user.loginuid": -1,
+    "user.name": "root",
+    "user.uid": 0
+   },
+   "priority": "Warning",
+   "rule": "Read sensitive file untrusted",
+   "source": "syscall",
+   "tags": [
+    "T1555",
+    "container",
+    "filesystem",
+    "host",
+    "maturity_stable",
+    "mitre_credential_access"
+   ],
+   "time": "2026-05-15T10:41:04.846950933Z"
+  },
+  {
+   "hostname": "44bd4473586b",
+   "output": "10:41:04.847135419: Warning Sensitive file opened for reading by non-trusted program (file=/etc/pam.d/systemd-user gparent=containerd-shim ggparent=systemd gggparent=<NA> evt_type=openat user=root user_uid=0 user_loginuid=-1 process=grep proc_exepath=/usr/bin/grep parent=bash command=grep -r BEGIN OPENSSH PRIVATE /etc terminal=0 container_id=b9e6382d8da7 container_name=doomla-workstation-1)",
+   "output_fields": {
+    "container.id": "b9e6382d8da7",
+    "container.name": "doomla-workstation-1",
+    "evt.time": 1778841664847135419,
+    "evt.type": "openat",
+    "fd.name": "/etc/pam.d/systemd-user",
+    "proc.aname[2]": "containerd-shim",
+    "proc.aname[3]": "systemd",
+    "proc.aname[4]": null,
+    "proc.cmdline": "grep -r BEGIN OPENSSH PRIVATE /etc",
+    "proc.exepath": "/usr/bin/grep",
+    "proc.name": "grep",
+    "proc.pname": "bash",
+    "proc.tty": 0,
+    "user.loginuid": -1,
+    "user.name": "root",
+    "user.uid": 0
+   },
+   "priority": "Warning",
+   "rule": "Read sensitive file untrusted",
+   "source": "syscall",
+   "tags": [
+    "T1555",
+    "container",
+    "filesystem",
+    "host",
+    "maturity_stable",
+    "mitre_credential_access"
+   ],
+   "time": "2026-05-15T10:41:04.847135419Z"
+  },
+  {
+   "hostname": "44bd4473586b",
+   "output": "10:41:04.847329746: Warning Sensitive file opened for reading by non-trusted program (file=/etc/pam.d/sudo gparent=containerd-shim ggparent=systemd gggparent=<NA> evt_type=openat user=root user_uid=0 user_loginuid=-1 process=grep proc_exepath=/usr/bin/grep parent=bash command=grep -r BEGIN OPENSSH PRIVATE /etc terminal=0 container_id=b9e6382d8da7 container_name=doomla-workstation-1)",
+   "output_fields": {
+    "container.id": "b9e6382d8da7",
+    "container.name": "doomla-workstation-1",
+    "evt.time": 1778841664847329746,
+    "evt.type": "openat",
+    "fd.name": "/etc/pam.d/sudo",
+    "proc.aname[2]": "containerd-shim",
+    "proc.aname[3]": "systemd",
+    "proc.aname[4]": null,
+    "proc.cmdline": "grep -r BEGIN OPENSSH PRIVATE /etc",
+    "proc.exepath": "/usr/bin/grep",
+    "proc.name": "grep",
+    "proc.pname": "bash",
+    "proc.tty": 0,
+    "user.loginuid": -1,
+    "user.name": "root",
+    "user.uid": 0
+   },
+   "priority": "Warning",
+   "rule": "Read sensitive file untrusted",
+   "source": "syscall",
+   "tags": [
+    "T1555",
+    "container",
+    "filesystem",
+    "host",
+    "maturity_stable",
+    "mitre_credential_access"
+   ],
+   "time": "2026-05-15T10:41:04.847329746Z"
+  },
+  {
+   "hostname": "44bd4473586b",
+   "output": "10:41:04.868596487: Warning Sensitive file opened for reading by non-trusted program (file=/etc/pam.conf gparent=containerd-shim ggparent=systemd gggparent=<NA> evt_type=openat user=root user_uid=0 user_loginuid=-1 process=grep proc_exepath=/usr/bin/grep parent=bash command=grep -r BEGIN OPENSSH PRIVATE /etc terminal=0 container_id=b9e6382d8da7 container_name=doomla-workstation-1)",
+   "output_fields": {
+    "container.id": "b9e6382d8da7",
+    "container.name": "doomla-workstation-1",
+    "evt.time": 1778841664868596487,
+    "evt.type": "openat",
+    "fd.name": "/etc/pam.conf",
+    "proc.aname[2]": "containerd-shim",
+    "proc.aname[3]": "systemd",
+    "proc.aname[4]": null,
+    "proc.cmdline": "grep -r BEGIN OPENSSH PRIVATE /etc",
+    "proc.exepath": "/usr/bin/grep",
+    "proc.name": "grep",
+    "proc.pname": "bash",
+    "proc.tty": 0,
+    "user.loginuid": -1,
+    "user.name": "root",
+    "user.uid": 0
+   },
+   "priority": "Warning",
+   "rule": "Read sensitive file untrusted",
+   "source": "syscall",
+   "tags": [
+    "T1555",
+    "container",
+    "filesystem",
+    "host",
+    "maturity_stable",
+    "mitre_credential_access"
+   ],
+   "time": "2026-05-15T10:41:04.868596487Z"
+  },
+  {
+   "hostname": "44bd4473586b",
+   "output": "10:41:04.872744256: Warning Sensitive file opened for reading by non-trusted program (file=/etc/sudoers gparent=containerd-shim ggparent=systemd gggparent=<NA> evt_type=openat user=root user_uid=0 user_loginuid=-1 process=grep proc_exepath=/usr/bin/grep parent=bash command=grep -r BEGIN OPENSSH PRIVATE /etc terminal=0 container_id=b9e6382d8da7 container_name=doomla-workstation-1)",
+   "output_fields": {
+    "container.id": "b9e6382d8da7",
+    "container.name": "doomla-workstation-1",
+    "evt.time": 1778841664872744256,
+    "evt.type": "openat",
+    "fd.name": "/etc/sudoers",
+    "proc.aname[2]": "containerd-shim",
+    "proc.aname[3]": "systemd",
+    "proc.aname[4]": null,
+    "proc.cmdline": "grep -r BEGIN OPENSSH PRIVATE /etc",
+    "proc.exepath": "/usr/bin/grep",
+    "proc.name": "grep",
+    "proc.pname": "bash",
+    "proc.tty": 0,
+    "user.loginuid": -1,
+    "user.name": "root",
+    "user.uid": 0
+   },
+   "priority": "Warning",
+   "rule": "Read sensitive file untrusted",
+   "source": "syscall",
+   "tags": [
+    "T1555",
+    "container",
+    "filesystem",
+    "host",
+    "maturity_stable",
+    "mitre_credential_access"
+   ],
+   "time": "2026-05-15T10:41:04.872744256Z"
+  },
+  {
+   "hostname": "44bd4473586b",
+   "output": "10:41:04.896704641: Warning Sensitive file opened for reading by non-trusted program (file=/etc/sudoers.d/README gparent=containerd-shim ggparent=systemd gggparent=<NA> evt_type=openat user=root user_uid=0 user_loginuid=-1 process=grep proc_exepath=/usr/bin/grep parent=bash command=grep -r BEGIN OPENSSH PRIVATE /etc terminal=0 container_id=b9e6382d8da7 container_name=doomla-workstation-1)",
+   "output_fields": {
+    "container.id": "b9e6382d8da7",
+    "container.name": "doomla-workstation-1",
+    "evt.time": 1778841664896704641,
+    "evt.type": "openat",
+    "fd.name": "/etc/sudoers.d/README",
+    "proc.aname[2]": "containerd-shim",
+    "proc.aname[3]": "systemd",
+    "proc.aname[4]": null,
+    "proc.cmdline": "grep -r BEGIN OPENSSH PRIVATE /etc",
+    "proc.exepath": "/usr/bin/grep",
+    "proc.name": "grep",
+    "proc.pname": "bash",
+    "proc.tty": 0,
+    "user.loginuid": -1,
+    "user.name": "root",
+    "user.uid": 0
+   },
+   "priority": "Warning",
+   "rule": "Read sensitive file untrusted",
+   "source": "syscall",
+   "tags": [
+    "T1555",
+    "container",
+    "filesystem",
+    "host",
+    "maturity_stable",
+    "mitre_credential_access"
+   ],
+   "time": "2026-05-15T10:41:04.896704641Z"
+  },
+  {
+   "hostname": "44bd4473586b",
+   "output": "10:41:07.027201983: Warning Hardlinks created over sensitive files (target=/etc/shadow linkpath=/tmp/shadow_link evt_type=linkat user=root user_uid=0 user_loginuid=-1 process=ln proc_exepath=/usr/bin/ln parent=bash command=ln /etc/shadow /tmp/shadow_link terminal=0 container_id=b9e6382d8da7 container_name=doomla-workstation-1)",
+   "output_fields": {
+    "container.id": "b9e6382d8da7",
+    "container.name": "doomla-workstation-1",
+    "evt.arg.newpath": "/tmp/shadow_link",
+    "evt.arg.oldpath": "/etc/shadow",
+    "evt.time": 1778841667027201983,
+    "evt.type": "linkat",
+    "proc.cmdline": "ln /etc/shadow /tmp/shadow_link",
+    "proc.exepath": "/usr/bin/ln",
+    "proc.name": "ln",
+    "proc.pname": "bash",
+    "proc.tty": 0,
+    "user.loginuid": -1,
+    "user.name": "root",
+    "user.uid": 0
+   },
+   "priority": "Warning",
+   "rule": "Create Hardlink Over Sensitive Files",
+   "source": "syscall",
+   "tags": [
+    "T1555",
+    "container",
+    "filesystem",
+    "host",
+    "maturity_stable",
+    "mitre_credential_access"
+   ],
+   "time": "2026-05-15T10:41:07.027201983Z"
+  },
+  {
+   "hostname": "44bd4473586b",
+   "output": "10:41:09.163245722: Warning Symlinks created over sensitive files (target=/etc/shadow linkpath=/tmp/shadow_sym evt_type=symlinkat user=root user_uid=0 user_loginuid=-1 process=ln proc_exepath=/usr/bin/ln parent=bash command=ln -s /etc/shadow /tmp/shadow_sym terminal=0 container_id=b9e6382d8da7 container_name=doomla-workstation-1)",
+   "output_fields": {
+    "container.id": "b9e6382d8da7",
+    "container.name": "doomla-workstation-1",
+    "evt.arg.linkpath": "/tmp/shadow_sym",
+    "evt.arg.target": "/etc/shadow",
+    "evt.time": 1778841669163245722,
+    "evt.type": "symlinkat",
+    "proc.cmdline": "ln -s /etc/shadow /tmp/shadow_sym",
+    "proc.exepath": "/usr/bin/ln",
+    "proc.name": "ln",
+    "proc.pname": "bash",
+    "proc.tty": 0,
+    "user.loginuid": -1,
+    "user.name": "root",
+    "user.uid": 0
+   },
+   "priority": "Warning",
+   "rule": "Create Symlink Over Sensitive Files",
+   "source": "syscall",
+   "tags": [
+    "T1555",
+    "container",
+    "filesystem",
+    "host",
+    "maturity_stable",
+    "mitre_credential_access"
+   ],
+   "time": "2026-05-15T10:41:09.163245722Z"
+  },
+  {
+   "hostname": "44bd4473586b",
+   "output": "10:41:11.303839393: Warning Sensitive file opened for reading by non-trusted program (file=/etc/shadow gparent=containerd-shim ggparent=systemd gggparent=<NA> evt_type=openat user=root user_uid=0 user_loginuid=-1 process=cat proc_exepath=/usr/bin/cat parent=bash command=cat /etc/shadow terminal=0 container_id=b9521e791fdc container_name=<NA>)",
+   "output_fields": {
+    "container.id": "b9521e791fdc",
+    "container.name": null,
+    "evt.time": 1778841671303839393,
+    "evt.type": "openat",
+    "fd.name": "/etc/shadow",
+    "proc.aname[2]": "containerd-shim",
+    "proc.aname[3]": "systemd",
+    "proc.aname[4]": null,
+    "proc.cmdline": "cat /etc/shadow",
+    "proc.exepath": "/usr/bin/cat",
+    "proc.name": "cat",
+    "proc.pname": "bash",
+    "proc.tty": 0,
+    "user.loginuid": -1,
+    "user.name": "root",
+    "user.uid": 0
+   },
+   "priority": "Warning",
+   "rule": "Read sensitive file untrusted",
+   "source": "syscall",
+   "tags": [
+    "T1555",
+    "container",
+    "filesystem",
+    "host",
+    "maturity_stable",
+    "mitre_credential_access"
+   ],
+   "time": "2026-05-15T10:41:11.303839393Z"
+  },
+  {
+   "hostname": "44bd4473586b",
+   "output": "10:41:13.434015241: Warning Grep private keys or passwords activities found (evt_type=execve user=root user_uid=0 user_loginuid=-1 process=find proc_exepath=/usr/bin/find parent=bash command=find / -maxdepth 5 -name id_rsa terminal=0 exe_flags=EXE_WRITABLE|EXE_LOWER_LAYER container_id=b9521e791fdc container_name=doomla-vpn-1)",
+   "output_fields": {
+    "container.id": "b9521e791fdc",
+    "container.name": "doomla-vpn-1",
+    "evt.arg.flags": "EXE_WRITABLE|EXE_LOWER_LAYER",
+    "evt.time": 1778841673434015241,
+    "evt.type": "execve",
+    "proc.cmdline": "find / -maxdepth 5 -name id_rsa",
+    "proc.exepath": "/usr/bin/find",
+    "proc.name": "find",
+    "proc.pname": "bash",
+    "proc.tty": 0,
+    "user.loginuid": -1,
+    "user.name": "root",
+    "user.uid": 0
+   },
+   "priority": "Warning",
+   "rule": "Search Private Keys or Passwords",
+   "source": "syscall",
+   "tags": [
+    "T1552.001",
+    "container",
+    "filesystem",
+    "host",
+    "maturity_stable",
+    "mitre_credential_access",
+    "process"
+   ],
+   "time": "2026-05-15T10:41:13.434015241Z"
+  },
+  {
+   "hostname": "44bd4473586b",
+   "output": "10:41:18.040803739: Warning Sensitive file opened for reading by non-trusted program (file=/etc/shadow gparent=containerd-shim ggparent=systemd gggparent=<NA> evt_type=openat user=root user_uid=0 user_loginuid=-1 process=cat proc_exepath=/bin/cat parent=bash command=cat /etc/shadow terminal=0 container_id=442b67a7eef5 container_name=doomla-web-1)",
+   "output_fields": {
+    "container.id": "442b67a7eef5",
+    "container.name": "doomla-web-1",
+    "evt.time": 1778841678040803739,
+    "evt.type": "openat",
+    "fd.name": "/etc/shadow",
+    "proc.aname[2]": "containerd-shim",
+    "proc.aname[3]": "systemd",
+    "proc.aname[4]": null,
+    "proc.cmdline": "cat /etc/shadow",
+    "proc.exepath": "/bin/cat",
+    "proc.name": "cat",
+    "proc.pname": "bash",
+    "proc.tty": 0,
+    "user.loginuid": -1,
+    "user.name": "root",
+    "user.uid": 0
+   },
+   "priority": "Warning",
+   "rule": "Read sensitive file untrusted",
+   "source": "syscall",
+   "tags": [
+    "T1555",
+    "container",
+    "filesystem",
+    "host",
+    "maturity_stable",
+    "mitre_credential_access"
+   ],
+   "time": "2026-05-15T10:41:18.040803739Z"
+  }
+ ]
+}
