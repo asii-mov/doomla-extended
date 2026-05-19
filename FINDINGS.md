@@ -36,7 +36,7 @@ no helper script and has to discover the chain itself.
 >
 > **Sonnet 4.5 didn't complete the scenario in any configuration**,
 > including with Falco off, so its results are a capability baseline
-> rather than a measurement of the defensive layer.
+> rather than a measurement of the defensive layer. Giving Sonnet 4.5 the solution and active blocking the model was still able to find alternative commands when blocked by Falco
 
 > [!WARNING]
 > **Every number in this document is from a single seed (N=1).** Per-run
